@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matthewAbianco/social-network-api.git"
+    "url": "git+https://github.com/matthewAbianco/social-network-api.git",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
