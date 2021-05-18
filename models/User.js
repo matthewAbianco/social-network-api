@@ -1,62 +1,51 @@
-const { Schema, model } = require('mongoose');
-const Thought = require('./Thought');
+const { Schema, model } = require("mongoose");
 
-const UserSchema = new Schema(
-   {  
-      username: {
-         type: String,
-         unique: true,
-         required: true,
-         trim: true
-      },
-      email: {
-         type: String,
-         required: true,
-         unique: true,
-
-         match: [/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/, 'Please enter a valid email address']
-      },
-      thoughts: [
-         {
-            type: Schema.Types.ObjectId,
-            ref: 'Thought'
-         }
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email address",
       ],
-      friends: [
-         {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-         }
-      ]
-   },
-   {
-      toJSON: {
-         virtuals: true,
-         getters: true
+    },
+    thoughts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Thought",
       },
-      id: false
-   }
+    ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+  {
+    toJSON: {
+      virtuals: true,
+      getters: true,
+    },
+    id: false,
+  }
 );
 
-
-UserSchema.virtual('friendCount').get(function () {
-   return this.friends.length;
+// get total count of friends on retrieval
+userSchema.virtual("friendCount").get(function () {
+  return this.friends.length;
 });
 
-UserSchema.post('findOneAndDelete', function(doc) {
-   const thoughts = doc.thoughts;
-   for (let i = 0; i < thoughts.length; i++) {
-      Thought.findOneAndDelete({ _id: thoughts[i] })
-      .then(dbThoughtData => {
-         if (!dbThoughtData) {
-            return new Error('No thought with this id!')
-         }
-         return dbThoughtData;
-      })
-      .catch(err => res.json(err));
-   }
-});
+// create the user model using userSchema
+const User = model("User", userSchema);
 
-const User = model('User', UserSchema);
-
+// export the model
 module.exports = User;
